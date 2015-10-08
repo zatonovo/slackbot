@@ -24,7 +24,8 @@ class MessageDispatcher(object):
     def dispatch_msg(self, msg):
         category = msg[0]
         msg = msg[1]
-        text = msg['text']
+        text = self.get_text(msg)
+        logger.info("Trying plugins on message %s" % text)
         responded = False
         for func, args in self._plugins.get_plugins(category, text):
             if func:
@@ -41,22 +42,14 @@ class MessageDispatcher(object):
             self._default_reply(msg)
 
     def _on_new_message(self, msg):
+        logger.info("Received message: %s"%msg)
         # ignore edits
         subtype = msg.get('subtype', '')
         if subtype == 'message_changed':
             return
 
         botname = self._client.login_data['self']['name']
-        try:
-            msguser = self._client.users.get(msg['user'])
-            username = msguser['name']
-        except KeyError:
-            if 'username' in msg:
-                username = msg['username']
-            else:
-                return
-
-        if username == botname or username == 'slackbot':
+        if self.get_username(msg) == botname:
             return
 
         msg_respond_to = self.filter_text(msg)
@@ -65,8 +58,32 @@ class MessageDispatcher(object):
         else:
             self._pool.add_task(('listen_to', msg))
 
-    def filter_text(self, msg):
+    def get_username(self, msg):
+        try:
+            if 'bot_id' in msg:
+              username = msg['bot_id']
+              msg['username'] = username
+            else:
+              msguser = self._client.users.get(msg['user'])
+              username = msguser['name']
+        except:
+            if 'username' in msg:
+                username = msg['username']
+        return username
+
+    def get_text(self, msg):
+        """Get text from message. If main text is empty, look for text field
+        in attachments.
+        """
         text = msg.get('text', '')
+        if text == '' and 'attachments' in msg:
+          try: text = msg['attachments'][0]['text']
+          except: text = ''
+        return text
+
+    def filter_text(self, msg):
+        text = self.get_text(msg)
+        logger.info("Got text: %s" % text)
         channel = msg['channel']
 
         if channel[0] == 'C' or channel[0] == 'G':
