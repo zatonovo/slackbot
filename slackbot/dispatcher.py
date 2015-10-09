@@ -4,7 +4,9 @@ import logging
 import re
 import time
 import traceback
+import importlib
 
+import settings
 from slackbot.utils import to_utf8, WorkerPool
 
 logger = logging.getLogger(__name__)
@@ -78,8 +80,12 @@ class MessageDispatcher(object):
         return
       
       handler = settings.HANDLERS[bot_id]
-      module = __import__(handler)
-      handler_fn = getattr(module, 'handle_bot_msg')
+      module = importlib.import_module(handler)
+      #import pdb;pdb.set_trace()
+      if not hasattr(module, 'handle_bot_message'):
+        msg = "Bot handler for %s does not have a handle_bot_msg function"
+        logger.warning(msg % bot_id)
+      handler_fn = getattr(module, 'handle_bot_message')
       handler_fn(msg)
 
     def get_username(self, msg):
