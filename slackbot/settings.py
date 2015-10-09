@@ -1,12 +1,29 @@
 import os
+from configobj import ConfigObj,
 
-DEBUG = False
+CONFFILE = os.getenv('PZBOT_CONFIG')
+CONFSPECFILE = os.getenv('PZBOT_CONFIG_SPEC')
 
-PLUGINS = [
-    'slackbot.plugins',
-]
+class ConfigError(Exception):
+  pass
 
-# API_TOKEN = '###token###'
+def _validate(config):
+  # Ensure configuration has proper data types
+  validator = Validator()
+  results = config.validate(validator)
+
+  if not results:
+    for (section_list, key, _) in flatten_errors(config, results):
+      if key is not None:
+        msg = 'The "%s" key in the section "%s" failed validation'
+        print msg % (key, ', '.join(section_list))
+      else:
+        print 'The following section was missing:%s ' % ', '.join(section_list)
+    raise ConfigError("Invalid Config syntax")
+
+
+
+
 
 '''
 If you use Slack Web API to send messages (with send_webapi() or reply_webapi()),
@@ -17,15 +34,14 @@ the used icon comes from bot settings and Icon or Emoji has no effect.
 # BOT_ICON = 'http://lorempixel.com/64/64/abstract/7/'
 # BOT_EMOJI = ':godmode:'
 
-for key in os.environ:
-    if key[:9] == 'SLACKBOT_':
-        name = key[9:]
-        globals()[name] = os.environ[key]
+configobj = ConfigObj(CONFFILE, encoding='UTF-8', configspec=CONFSPECFILE)
+_validate(configobj)
 
-try:
-    from slackbot_settings import *
-except ImportError:
-    try:
-        from local_settings import *
-    except ImportError:
-        pass
+config = configobj['slackbot']
+
+DEBUG = config['debug']
+API_TOKEN = config['api_token']
+PLUGINS = config['plugins']
+
+HANDLERS = config['handlers'].dict()
+

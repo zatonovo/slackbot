@@ -12,6 +12,9 @@ logger = logging.getLogger(__name__)
 AT_MESSAGE_MATCHER = re.compile(r'^\<@(\w+)\>:? (.*)$')
 
 
+def from_bot(msg):
+  return 'bot_id' in msg
+
 class MessageDispatcher(object):
     def __init__(self, slackclient, plugins):
         self._client = slackclient
@@ -42,6 +45,10 @@ class MessageDispatcher(object):
             self._default_reply(msg)
 
     def _on_new_message(self, msg):
+        """
+        Handle a new message and dispatch to the appropriate pool.
+        If the message came from a bot, use the appropriate service handler.
+        """
         logger.info("Received message: %s"%msg)
         # ignore edits
         subtype = msg.get('subtype', '')
@@ -52,15 +59,32 @@ class MessageDispatcher(object):
         if self.get_username(msg) == botname:
             return
 
+        if from_bot(msg): return self._on_bot_message(msg)
+
         msg_respond_to = self.filter_text(msg)
         if msg_respond_to:
             self._pool.add_task(('respond_to', msg_respond_to))
         else:
             self._pool.add_task(('listen_to', msg))
 
+    def _on_bot_message(self, msg):
+      """
+      Check bot handlers for appropriate handler, otherwise return.
+      """
+      bot_id = msg['bot_id']
+      if bot_id not in settings.HANDLERS:
+        msg = "Ignoring message from bot_id %s with no registered handler"
+        logger.info(msg % bot_id)
+        return
+      
+      handler = settings.HANDLERS[bot_id]
+      module = __import__(handler)
+      handler_fn = getattr(module, 'handle_bot_msg')
+      handler_fn(msg)
+
     def get_username(self, msg):
         try:
-            if 'bot_id' in msg:
+            if from_bot(msg):
               username = msg['bot_id']
               msg['username'] = username
             else:
