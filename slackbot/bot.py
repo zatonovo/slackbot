@@ -87,16 +87,16 @@ class PluginsManager(object):
 
 
 def respond_to(matchstr, flags=0):
-    def wrapper(func):
-        PluginsManager.commands['respond_to'][re.compile(matchstr, flags)] = func
-        logger.info('registered respond_to plugin "%s" to "%s"', func.__name__, matchstr)
-        return func
-    return wrapper
+  def wrapper(func):
+    PluginsManager.commands['respond_to'][re.compile(matchstr, flags)] = func
+    logger.info('Registered respond_to plugin "%s" to "%s"', func.__name__, matchstr)
+    return func
+  return wrapper
 
 
 def listen_to(matchstr, flags=0):
-    def wrapper(func):
-        PluginsManager.commands['listen_to'][re.compile(matchstr, flags)] = func
-        logger.info('registered listen_to plugin "%s" to "%s"', func.__name__, matchstr)
-        return func
-    return wrapper
+  def wrapper(func):
+    PluginsManager.commands['listen_to'][re.compile(matchstr, flags)] = func
+    logger.info('Registered listen_to plugin "%s" to "%s"', func.__name__, matchstr)
+    return func
+  return wrapper

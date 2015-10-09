@@ -38,9 +38,11 @@ class MessageDispatcher(object):
                 try:
                     func(Message(self._client, msg), *args)
                 except:
-                    logger.exception('failed to handle message %s with plugin "%s"', text, func.__name__)
-                    reply = '[%s] I have problem when handling "%s"\n' % (func.__name__, text)
-                    reply += '```\n%s\n```' % traceback.format_exc()
+                    err = 'Failed to handle message %s with plugin "%s"'
+                    logger.exception(err, text, func.__name__)
+                    logger.exception('\n%s\n' % traceback.format_exc())
+                    reply = 'YIPE! "%s" failed to handle "%s"\n' % (func.__name__, text)
+                    #reply += '```\n%s\n```' % traceback.format_exc()
                     self._client.rtm_send_message(msg['channel'], reply)
 
         if not responded and category == 'respond_to':
@@ -75,18 +77,24 @@ class MessageDispatcher(object):
       """
       bot_id = msg['bot_id']
       if bot_id not in settings.HANDLERS:
-        msg = "Ignoring message from bot_id %s with no registered handler"
-        logger.info(msg % bot_id)
+        err = "Ignoring message from bot_id %s with no registered handler"
+        logger.info(err % bot_id)
         return
       
       handler = settings.HANDLERS[bot_id]
       module = importlib.import_module(handler)
       #import pdb;pdb.set_trace()
       if not hasattr(module, 'handle_bot_message'):
-        msg = "Bot handler for %s does not have a handle_bot_msg function"
-        logger.warning(msg % bot_id)
+        err = "Bot handler for %s does not have a handle_bot_msg function"
+        logger.warning(err % bot_id)
+        return
+
       handler_fn = getattr(module, 'handle_bot_message')
-      handler_fn(msg)
+      try: handler_fn(Message(self._client, msg))
+      except:
+        err = 'Failed to handle message %s with bot handler "%s"'
+        logger.exception(err, msg['attachments'], handler)
+        logger.exception('\n%s\n' % traceback.format_exc())
 
     def get_username(self, msg):
         try:
