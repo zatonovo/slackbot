@@ -94,3 +94,4 @@ PLUGINS = [
     'mybot.plugins',
 ]
 ```
+

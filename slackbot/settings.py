@@ -1,5 +1,5 @@
 import os
-from configobj import ConfigObj,
+from configobj import ConfigObj
 
 CONFFILE = os.getenv('PZBOT_CONFIG')
 CONFSPECFILE = os.getenv('PZBOT_CONFIG_SPEC')
