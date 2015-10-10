@@ -1,5 +1,6 @@
 import os
-from configobj import ConfigObj
+from configobj import ConfigObj, flatten_errors
+from validate import Validator
 
 CONFFILE = os.getenv('PZBOT_CONFIG')
 CONFSPECFILE = os.getenv('PZBOT_CONFIG_SPEC')
@@ -34,7 +35,8 @@ the used icon comes from bot settings and Icon or Emoji has no effect.
 # BOT_ICON = 'http://lorempixel.com/64/64/abstract/7/'
 # BOT_EMOJI = ':godmode:'
 
-configobj = ConfigObj(CONFFILE, encoding='UTF-8', configspec=CONFSPECFILE)
+configobj = ConfigObj(CONFFILE, unrepr=True, encoding='UTF-8',
+  configspec=CONFSPECFILE)
 _validate(configobj)
 
 config = configobj['slackbot']
