@@ -26,16 +26,8 @@ First you need to get the slack api token for your bot. You have two options:
 2. If you use a real slack user, you can generate an api token on [slack web api page](https://api.slack.com/web).
 
 ### Configure the api token
+This uses a configuration file.
 
-Then you need to configure the `API_TOKEN` in a python module `slackbot_settings.py`, which must be located in a python import path.
-
-slackbot_settings.py:
-
-```python
-API_TOKEN = "<your-api-token>"
-```
-
-Alternatively, you can use the environment variable `SLACKBOT_API_TOKEN`.
 
 ### Run the bot
 
