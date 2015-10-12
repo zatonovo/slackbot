@@ -26,7 +26,12 @@ First you need to get the slack api token for your bot. You have two options:
 2. If you use a real slack user, you can generate an api token on [slack web api page](https://api.slack.com/web).
 
 ### Configure the api token
-This uses a configuration file.
+This uses a configuration file and looks for a section called slackbot.
+Keys include
+
++ debug (default: False)
++ api_token (default: '')
++ plugins (default: ['slackbot.plugins'])
 
 
 ### Run the bot
