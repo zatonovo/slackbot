@@ -81,7 +81,12 @@ class MessageDispatcher(object):
         logger.info(err % bot_id)
         return
       
-      handler = settings.HANDLERS[bot_id]
+      def _get_handler(bot_id):
+        val = settings.HANDLERS[bot_id]
+        if not isinstance(val,tuple): return (val,[])
+        return (val[0], val[1:])
+
+      (handler,args) = _get_handler(bot_id)
       module = importlib.import_module(handler)
       #import pdb;pdb.set_trace()
       if not hasattr(module, 'handle_bot_message'):
@@ -90,7 +95,7 @@ class MessageDispatcher(object):
         return
 
       handler_fn = getattr(module, 'handle_bot_message')
-      try: handler_fn(Message(self._client, msg))
+      try: handler_fn(Message(self._client, msg), *args)
       except:
         err = 'Failed to handle message %s with bot handler "%s"'
         logger.exception(err, msg['attachments'], handler)
