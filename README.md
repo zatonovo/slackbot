@@ -27,12 +27,32 @@ First you need to get the slack api token for your bot. You have two options:
 
 ### Configure the api token
 This uses a configuration file and looks for a section called slackbot.
-Keys include
+Both the config file and its spec are specified using Panoptez-specific
+names:
+
++ `PZBOT_CONFIG`
++ `PZBOT_CONFIG_SPEC`
+
+If these don't exist, the bot fails startup. 
+
+The available keys include:
 
 + debug (default: False)
 + api_token (default: '')
 + plugins (default: ['slackbot.plugins'])
 
+Here's an example:
+
+```
+[slackbot]
+debug = False
+api_token = ''
+plugins = ['slackbot.plugins',]
+```
+Note the trailing comma, to force the ConfigObj to parse as a list.
+
+Under slackbot, a `[[handlers]]` subsection can be added that specifies
+how to handle bot messages. The format is `bot_id = handler module`.
 
 ### Run the bot
 
