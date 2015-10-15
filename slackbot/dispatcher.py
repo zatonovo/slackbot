@@ -15,7 +15,7 @@ AT_MESSAGE_MATCHER = re.compile(r'^\<@(\w+)\>:? (.*)$')
 
 
 def from_bot(msg):
-  return 'bot_id' in msg
+  return 'bot_id' in msg and msg['bot_id'] is not None
 
 class MessageDispatcher(object):
     def __init__(self, slackclient, plugins):
