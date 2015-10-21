@@ -155,13 +155,15 @@ class MessageDispatcher(object):
             time.sleep(1)
 
     def _default_reply(self, msg):
-        default_reply = [
-            u'Bad command "%s", You can ask me one of the following questions:\n' % msg['text'],
-        ]
-        default_reply += [u'    • `{}`'.format(p.pattern) for p in self._plugins.commands['respond_to'].iterkeys()]
-
-        self._client.rtm_send_message(msg['channel'],
-                                     '\n'.join(to_utf8(default_reply)))
+      if 'text' in msg:
+        logger.info("Responding to unrecogized command '%s'" %msg['text'])
+        #default_reply = [
+            #u'Bad command "%s", You can ask me one of the following questions:\n' % msg['text'],
+        #]
+        #default_reply += [u'    • `{}`'.format(p.pattern) for p in self._plugins.commands['respond_to'].iterkeys()]
+      default_reply = "Unrecognized command. Try !help for Panoptez usage"
+      self._client.rtm_send_message(msg['channel'], to_utf8(default_reply))
+                                     #'\n'.join(to_utf8(default_reply)))
 
 
 class Message(object):
