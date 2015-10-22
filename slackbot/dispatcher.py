@@ -110,8 +110,13 @@ class MessageDispatcher(object):
               msguser = self._client.users.get(msg['user'])
               username = msguser['name']
         except:
+            err = 'Failed to get username for %s'
+            logger.exception(err, msg['user'])
+            logger.exception('\n%s\n' % traceback.format_exc())
             if 'username' in msg:
                 username = msg['username']
+            else:
+                username = msg['user']
         return username
 
     def get_text(self, msg):
