@@ -17,6 +17,7 @@ AT_MESSAGE_MATCHER = re.compile(r'^\<@(\w+)\>:? (.*)$')
 def from_bot(msg):
   return 'bot_id' in msg and msg['bot_id'] is not None
 
+
 class MessageDispatcher(object):
     def __init__(self, slackclient, plugins):
         self._client = slackclient
@@ -60,8 +61,7 @@ class MessageDispatcher(object):
             return
 
         botname = self._client.login_data['self']['name']
-        if self.get_username(msg) == botname:
-            return
+        if self.get_username(msg) == botname: return
 
         if from_bot(msg): return self._on_bot_message(msg)
 
@@ -98,26 +98,28 @@ class MessageDispatcher(object):
       try: handler_fn(Message(self._client, msg), *args)
       except:
         err = 'Failed to handle message %s with bot handler "%s"'
-        logger.exception(err, msg['attachments'], handler)
+        logger.exception(err, msg, handler)
         logger.exception('\n%s\n' % traceback.format_exc())
 
     def get_username(self, msg):
-        try:
-            if from_bot(msg):
-              username = msg['bot_id']
-              msg['username'] = username
-            else:
-              msguser = self._client.users.get(msg['user'])
-              username = msguser['name']
-        except:
-            err = 'Failed to get username for %s'
-            logger.exception(err, msg['user'])
-            logger.exception('\n%s\n' % traceback.format_exc())
-            if 'username' in msg:
-                username = msg['username']
-            else:
-                username = msg['user']
-        return username
+      try:
+        #import pdb;pdb.set_trace()
+        if from_bot(msg):
+          username = msg['bot_id']
+        else:
+          msguser = self._client.users.get(msg['user'])
+          username = msguser['name']
+      except:
+        err = 'Failed to get username for %s'
+        logger.exception(err, msg['user'])
+        logger.exception('\n%s\n' % traceback.format_exc())
+        if 'username' in msg:
+          username = msg['username']
+        else:
+          username = msg['user']
+      msg['username'] = username
+      return username
+
 
     def get_text(self, msg):
         """Get text from message. If main text is empty, look for text field
