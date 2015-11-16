@@ -56,9 +56,9 @@ class MessageDispatcher(object):
         """
         logger.info("Received message: %s"%msg)
         # ignore edits
+        ignore = [ 'message_changed', 'channel_join' ]
         subtype = msg.get('subtype', '')
-        if subtype == 'message_changed':
-            return
+        if subtype in ignore: return
 
         botname = self._client.login_data['self']['name']
         if self.get_username(msg) == botname: return
