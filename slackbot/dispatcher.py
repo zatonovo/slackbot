@@ -3,7 +3,7 @@
 import logging
 import re
 import time
-import traceback
+#import traceback
 import importlib
 
 import settings
@@ -41,7 +41,7 @@ class MessageDispatcher(object):
                 except:
                     err = 'Failed to handle message %s with plugin "%s"'
                     logger.exception(err, text, func.__name__)
-                    logger.exception('\n%s\n' % traceback.format_exc())
+                    #logger.exception('\n%s\n' % traceback.format_exc())
                     reply = 'YIPE! "%s" failed to handle "%s"\n' % (func.__name__, text)
                     #reply += '```\n%s\n```' % traceback.format_exc()
                     self._client.rtm_send_message(msg['channel'], reply)
@@ -99,7 +99,7 @@ class MessageDispatcher(object):
       except:
         err = 'Failed to handle message %s with bot handler "%s"'
         logger.exception(err, msg, handler)
-        logger.exception('\n%s\n' % traceback.format_exc())
+        #logger.exception('\n%s\n' % traceback.format_exc())
 
     def get_username(self, msg):
       try:
@@ -112,7 +112,7 @@ class MessageDispatcher(object):
       except:
         err = 'Failed to get username for %s'
         logger.exception(err, msg['user'])
-        logger.exception('\n%s\n' % traceback.format_exc())
+        #logger.exception('\n%s\n' % traceback.format_exc())
         if 'username' in msg:
           username = msg['username']
         else:
