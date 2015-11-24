@@ -56,7 +56,7 @@ class MessageDispatcher(object):
         """
         logger.info("Received message: %s"%msg)
         # ignore edits
-        ignore = [ 'message_changed', 'channel_join' ]
+        ignore = [ 'message_changed', 'channel_join', 'message_deleted' ]
         subtype = msg.get('subtype', '')
         if subtype in ignore: return
 
@@ -110,13 +110,14 @@ class MessageDispatcher(object):
           msguser = self._client.users.get(msg['user'])
           username = msguser['name']
       except:
-        err = 'Failed to get username for %s'
-        logger.exception(err, msg['user'])
-        #logger.exception('\n%s\n' % traceback.format_exc())
         if 'username' in msg:
           username = msg['username']
-        else:
+        elif 'user' in msg:
           username = msg['user']
+        else:
+          username = 'NA'
+        err = 'Failed to get username for %s'
+        logger.exception(err, username)
       msg['username'] = username
       return username
 
