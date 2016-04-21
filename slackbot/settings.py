@@ -42,8 +42,11 @@ _validate(configobj)
 config = configobj['slackbot']
 
 DEBUG = config['debug']
-API_TOKEN = config['api_token']
 PLUGINS = config['plugins']
+try:
+  API_TOKEN = config['api_token']
+except:
+  API_TOKEN = None
 
 HANDLERS = config['handlers'].dict()
 

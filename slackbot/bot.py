@@ -18,14 +18,16 @@ logger = logging.getLogger(__name__)
 
 
 class Bot(object):
-    def __init__(self):
-        self._client = SlackClient(
-            settings.API_TOKEN,
-            bot_icon = settings.BOT_ICON if hasattr(settings, 'BOT_ICON') else None,
-            bot_emoji = settings.BOT_EMOJI if hasattr(settings, 'BOT_EMOJI') else None
-        )
-        self._plugins = PluginsManager()
-        self._dispatcher = MessageDispatcher(self._client, self._plugins)
+    def __init__(self, api_token=None):
+      if api_token is None:
+        api_token = settings.API_TOKEN
+      self._client = SlackClient(
+        api_token,
+        bot_icon = settings.BOT_ICON if hasattr(settings, 'BOT_ICON') else None,
+        bot_emoji = settings.BOT_EMOJI if hasattr(settings, 'BOT_EMOJI') else None
+      )
+      self._plugins = PluginsManager()
+      self._dispatcher = MessageDispatcher(self._client, self._plugins)
 
     def run(self):
         self._plugins.init_plugins()
