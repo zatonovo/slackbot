@@ -30,18 +30,26 @@ class Bot(object):
       self._dispatcher = MessageDispatcher(self._client, self._plugins)
 
     def run(self):
-        self._plugins.init_plugins()
-        self._dispatcher.start()
-        self._client.rtm_connect()
-        thread.start_new_thread(self._keepactive, tuple())
-        logger.info('connected to slack RTM api')
-        self._dispatcher.loop()
+      self._plugins.init_plugins()
+      self._dispatcher.start()
+      self._client.rtm_connect()
+      thread.start_new_thread(self._keepactive, tuple())
+      logger.info('connected to slack RTM api')
+      self._dispatcher.loop()
+
+    def send_message(self, channel, message, **kwargs):
+      """
+      Send a message using the web API
+      """
+      logger.info("Send to %s: %s" % (channel,message))
+      self._client.webapi.chat.post_message(channel, message, as_user=True, **kwargs)
 
     def _keepactive(self):
         logger.info('keep active thread started')
         while True:
             time.sleep(30 * 60)
             self._client.ping()
+
 
 
 class PluginsManager(object):

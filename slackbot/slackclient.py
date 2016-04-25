@@ -43,9 +43,14 @@ class SlackClient(object):
                 self.rtm_connect()
                 logger.warning('reconnected to slack rtm websocket')
                 return
-            except:
-                logger.exception('failed to reconnect')
-                time.sleep(1)
+            except Exception, e:
+                if e.message == 'account_inactive':
+                  logger.warning('Stop bot for inactive account')
+                  self.stop()
+                  return
+                else:
+                  logger.exception('failed to reconnect')
+                  time.sleep(1)
 
     def parse_slack_login_data(self, login_data):
         self.login_data = login_data
@@ -127,6 +132,19 @@ class SlackClient(object):
         for userid, user in self.users.iteritems():
             if user['name'] == username:
                 return userid
+
+    def stop(self):
+      """
+      If a bot account is disabled, stop and destroy the websocket connection
+      """
+      logger.info("Destroying web socket")
+      try:
+        self.websocket.close()
+      except:
+        pass
+      finally:
+        self.websocket = None
+      self.webapi = None
 
 
 class SlackConnectionError(Exception):
