@@ -40,7 +40,7 @@ class Bot(object):
 
     def stop(self):
       self._stop.set()
-      self._dispatcher.set()
+      self._dispatcher.stop()
 
     def send_message(self, channel, message, **kwargs):
       """

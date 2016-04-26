@@ -160,6 +160,7 @@ class MessageDispatcher(object):
         try:
           events = self._client.rtm_read()
         except slacker.Error, e:
+          self.stop()
           break
 
         for event in events:
@@ -167,7 +168,6 @@ class MessageDispatcher(object):
             continue
           self._on_new_message(event)
         self._stop.wait(1.0)
-      self.stop()
 
     def stop(self):
       logger.info("Stopping threads")
