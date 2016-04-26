@@ -3,7 +3,7 @@
 import os
 import logging
 import tempfile
-import thread
+import thread, threading
 import Queue
 import requests
 from contextlib import contextmanager
@@ -61,15 +61,22 @@ class WorkerPool(object):
         self.nworker = nworker
         self.func = func
         self.queue = Queue.Queue()
+        self._stop = threading.Event()
 
     def start(self):
         for _ in xrange(self.nworker):
             thread.start_new_thread(self.do_work, tuple())
 
+    def stop(self):
+        self._stop.set()
+
     def add_task(self, msg):
         self.queue.put(msg)
 
     def do_work(self):
-        while True:
-            msg = self.queue.get()
+        while not self._stop.isSet():
+            try:
+              msg = self.queue.get(timeout=1)
+            except Queue.Empty:
+              continue
             self.func(msg)

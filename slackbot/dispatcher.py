@@ -3,8 +3,9 @@
 import logging
 import re
 import time
-#import traceback
 import importlib
+import threading
+import slacker
 
 import settings
 from slackbot.utils import to_utf8, WorkerPool
@@ -23,6 +24,7 @@ class MessageDispatcher(object):
         self._client = slackclient
         self._pool = WorkerPool(self.dispatch_msg)
         self._plugins = plugins
+        self._stop = threading.Event()
 
     def start(self):
         self._pool.start()
@@ -154,13 +156,24 @@ class MessageDispatcher(object):
         return msg
 
     def loop(self):
-        while True:
-            events = self._client.rtm_read()
-            for event in events:
-                if event.get('type') != 'message':
-                    continue
-                self._on_new_message(event)
-            time.sleep(1)
+      while not self._stop.isSet():
+        try:
+          events = self._client.rtm_read()
+        except slacker.Error, e:
+          break
+
+        for event in events:
+          if event.get('type') != 'message':
+            continue
+          self._on_new_message(event)
+        self._stop.wait(1.0)
+      self.stop()
+
+    def stop(self):
+      logger.info("Stopping threads")
+      if not self._stop.isSet(): self._stop.set()
+      if self._client is not None: self._client.stop()
+      if self._pool is not None: self._pool.stop()
 
     def _default_reply(self, msg):
       if 'text' in msg:

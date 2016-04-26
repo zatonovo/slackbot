@@ -6,7 +6,7 @@ import importlib
 import logging
 import os
 import re
-import thread
+import thread, threading
 import time
 
 from slackbot import settings
@@ -28,14 +28,19 @@ class Bot(object):
       )
       self._plugins = PluginsManager()
       self._dispatcher = MessageDispatcher(self._client, self._plugins)
+      self._stop = threading.Event()
 
     def run(self):
       self._plugins.init_plugins()
       self._dispatcher.start()
       self._client.rtm_connect()
       thread.start_new_thread(self._keepactive, tuple())
-      logger.info('connected to slack RTM api')
+      logger.info('Connected to slack RTM api')
       self._dispatcher.loop()
+
+    def stop(self):
+      self._stop.set()
+      self._dispatcher.set()
 
     def send_message(self, channel, message, **kwargs):
       """
@@ -45,10 +50,11 @@ class Bot(object):
       self._client.webapi.chat.post_message(channel, message, as_user=True, **kwargs)
 
     def _keepactive(self):
-        logger.info('keep active thread started')
-        while True:
-            time.sleep(30 * 60)
-            self._client.ping()
+      logger.info('Start heartbeat thread')
+      while not self._stop.isSet():
+        self._stop.wait(30.0 * 60)
+        self._client.ping()
+      logger.info("Stop heartbeat thread")
 
 
 
