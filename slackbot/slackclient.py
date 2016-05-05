@@ -48,6 +48,11 @@ class SlackClient(object):
             msg = 'Bot account changed to inactive. Sending signal to shut down'
             logger.warning(msg)
             raise e
+          if e.message == 'token_revoked':
+            msg = 'Token revoked. Sending signal to shutdown'
+            logger.warning(msg)
+            raise e
+          time.sleep(1)
         except Exception, e:
           logger.exception('failed to reconnect')
           time.sleep(1)
