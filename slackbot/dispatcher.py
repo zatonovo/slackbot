@@ -182,7 +182,7 @@ class MessageDispatcher(object):
             #u'Bad command "%s", You can ask me one of the following questions:\n' % msg['text'],
         #]
         #default_reply += [u'    • `{}`'.format(p.pattern) for p in self._plugins.commands['respond_to'].iterkeys()]
-      default_reply = "Unrecognized command. Try !help for Panoptez usage"
+      default_reply = "Oops, I'm not set up to answer that"
       self._client.rtm_send_message(msg['channel'], to_utf8(default_reply))
                                      #'\n'.join(to_utf8(default_reply)))
 
