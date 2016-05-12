@@ -94,7 +94,7 @@ class PluginsManager(object):
         logger.info("[%s] Getting available plugins" % category)
         import inspect
         f = lambda v: "%s.%s (%s)" % (v.__module__, v.__name__, inspect.getsourcefile(v))
-        pretty = { k.pattern:f(v). for k,v in self.commands[category].items() }
+        pretty = { k.pattern:f(v) for k,v in self.commands[category].items() }
         logger.info("[%s] Got commands: \n%s" % (category, pretty))
         has_matching_plugin = False
         for matcher in self.commands[category]:
