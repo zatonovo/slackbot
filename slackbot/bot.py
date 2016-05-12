@@ -77,16 +77,17 @@ class PluginsManager(object):
             self._load_plugins(plugin)
 
     def _load_plugins(self, plugin):
-        logger.info('loading plugin "%s"', plugin)
+        logger.info('Loading plugin "%s"', plugin)
         path_name = None
         for mod in plugin.split('.'):
             if path_name is not None:
                 path_name = [path_name]
             _, path_name, _ = imp.find_module(mod, path_name)
-            logger.info("[%s] Found module path '%s'" % (plugin,path_name))
+        logger.info("[%s] Found module path '%s'" % (plugin,path_name))
         for pyfile in glob('{}/[!_]*.py'.format(path_name)):
             module = '.'.join((plugin, os.path.split(pyfile)[-1][:-3]))
             try:
+                logger.info("[%s] Loading module '%s' from '%s'" % (plugin,module,pyfile))
                 importlib.import_module(module)
             except:
                 logger.exception('Failed to import %s', module)
