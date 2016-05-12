@@ -83,6 +83,7 @@ class PluginsManager(object):
             if path_name is not None:
                 path_name = [path_name]
             _, path_name, _ = imp.find_module(mod, path_name)
+            logger.info("[%s] Found module path '%s'" % (plugin,path_name))
         for pyfile in glob('{}/[!_]*.py'.format(path_name)):
             module = '.'.join((plugin, os.path.split(pyfile)[-1][:-3]))
             try:
