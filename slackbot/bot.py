@@ -83,21 +83,14 @@ class PluginsManager(object):
             if path_name is not None:
                 path_name = [path_name]
             _, path_name, _ = imp.find_module(mod, path_name)
-        logger.info("[%s] Found module path '%s'" % (plugin,path_name))
         for pyfile in glob('{}/[!_]*.py'.format(path_name)):
             module = '.'.join((plugin, os.path.split(pyfile)[-1][:-3]))
             try:
-                logger.info("[%s] Loading module '%s' from '%s'" % (plugin,module,pyfile))
                 importlib.import_module(module)
             except:
                 logger.exception('Failed to import %s', module)
 
     def get_plugins(self, category, text):
-        logger.info("[%s] Getting available plugins" % category)
-        import inspect
-        f = lambda v: "%s.%s (%s)" % (v.__module__, v.__name__, inspect.getsourcefile(v))
-        pretty = { k.pattern:f(v) for k,v in self.commands[category].items() }
-        logger.info("[%s] Got commands: \n%s" % (category, pretty))
         has_matching_plugin = False
         for matcher in self.commands[category]:
             m = matcher.search(text)
