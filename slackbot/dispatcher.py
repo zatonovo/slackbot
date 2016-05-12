@@ -39,6 +39,7 @@ class MessageDispatcher(object):
             if func:
                 responded = True
                 try:
+                    logger.info("Calling plugin '%s'" % func.__name__)
                     func(Message(self._client, msg), *args)
                 except:
                     err = 'Failed to handle message %s with plugin "%s"'

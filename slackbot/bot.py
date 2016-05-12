@@ -91,6 +91,8 @@ class PluginsManager(object):
                 logger.exception('Failed to import %s', module)
 
     def get_plugins(self, category, text):
+        logger.info("[%s] Getting available plugins" % category)
+        logger.info("[%s] Got commands: \n%s" % (category, self.commands[category]))
         has_matching_plugin = False
         for matcher in self.commands[category]:
             m = matcher.search(text)
