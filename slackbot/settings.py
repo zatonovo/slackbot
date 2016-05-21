@@ -35,9 +35,9 @@ the used icon comes from bot settings and Icon or Emoji has no effect.
 # BOT_ICON = 'http://lorempixel.com/64/64/abstract/7/'
 # BOT_EMOJI = ':godmode:'
 
-configobj = ConfigObj(CONFFILE, unrepr=True, encoding='UTF-8',
-  configspec=CONFSPECFILE)
-_validate(configobj)
+configobj = ConfigObj(CONFFILE, unrepr=True, encoding='UTF-8')
+#  configspec=CONFSPECFILE)
+#_validate(configobj)
 
 config = configobj['slackbot']
 
