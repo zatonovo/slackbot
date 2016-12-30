@@ -7,7 +7,7 @@ import importlib
 import threading
 import slacker
 
-import settings
+from . import settings
 from slackbot.utils import to_utf8, WorkerPool
 
 logger = logging.getLogger(__name__)
@@ -160,7 +160,7 @@ class MessageDispatcher(object):
       while not self._stop.isSet():
         try:
           events = self._client.rtm_read()
-        except slacker.Error, e:
+        except slacker.Error as e:
           self.stop()
           break
 
@@ -200,7 +200,7 @@ class Message(object):
         return self._client.find_user_by_name(self._body['username'])
 
     def _gen_at_message(self, text):
-        text = u'<@{}>: {}'.format(self._get_user_id(), text)
+        text = '<@{}>: {}'.format(self._get_user_id(), text)
         return text
 
     def _gen_reply(self, text):

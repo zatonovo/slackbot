@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from __future__ import print_function
+
 import os
 import json
 import logging
@@ -43,7 +43,7 @@ class SlackClient(object):
           self.rtm_connect()
           logger.warning('reconnected to slack rtm websocket')
           return
-        except slacker.Error, e:
+        except slacker.Error as e:
           if e.message == 'account_inactive':
             msg = 'Bot account changed to inactive. Sending signal to shut down'
             logger.warning(msg)
@@ -53,7 +53,7 @@ class SlackClient(object):
             logger.warning(msg)
             raise e
           time.sleep(1)
-        except Exception, e:
+        except Exception as e:
           logger.exception('failed to reconnect')
           time.sleep(1)
 
@@ -88,7 +88,7 @@ class SlackClient(object):
         while True:
             try:
                 data += '{0}\n'.format(self.websocket.recv())
-            except WebSocketException, e:
+            except WebSocketException as e:
                 if isinstance(e, WebSocketConnectionClosedException):
                     logger.warning('lost websocket connection, try to reconnect now')
                 else:
@@ -134,7 +134,7 @@ class SlackClient(object):
         return Channel(self, self.channels[channel_id])
 
     def find_user_by_name(self, username):
-        for userid, user in self.users.iteritems():
+        for userid, user in self.users.items():
             if user['name'] == username:
                 return userid
 

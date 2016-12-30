@@ -3,8 +3,8 @@
 import os
 import logging
 import tempfile
-import thread, threading
-import Queue
+import _thread, threading
+import queue
 import requests
 from contextlib import contextmanager
 
@@ -31,12 +31,12 @@ def to_utf8(s):
     'a'
     >>> to_utf8(u'a')
     'a'
-    >>> to_utf8([u'a', u'b', u'\u4f60'])
+    >>> to_utf8([u'a', u'b', u'\\u4f60'])
     ['a', 'b', '\\xe4\\xbd\\xa0']
     """
     if isinstance(s, str):
         return s
-    elif isinstance(s, unicode):
+    elif isinstance(s, str):
         return s.encode('utf-8')
     elif isinstance(s, (list, tuple, set)):
         return [to_utf8(v) for v in s]
@@ -60,12 +60,12 @@ class WorkerPool(object):
     def __init__(self, func, nworker=10):
         self.nworker = nworker
         self.func = func
-        self.queue = Queue.Queue()
+        self.queue = queue.Queue()
         self._stop = threading.Event()
 
     def start(self):
-        for _ in xrange(self.nworker):
-            thread.start_new_thread(self.do_work, tuple())
+        for _ in range(self.nworker):
+            _thread.start_new_thread(self.do_work, tuple())
 
     def stop(self):
         self._stop.set()
@@ -77,6 +77,6 @@ class WorkerPool(object):
         while not self._stop.isSet():
             try:
               msg = self.queue.get(timeout=1)
-            except Queue.Empty:
+            except queue.Empty:
               continue
             self.func(msg)
